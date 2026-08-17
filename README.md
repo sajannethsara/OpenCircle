@@ -1,39 +1,36 @@
-# OpenCircle (OC) Platform ⭕
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-> **Empowering Sri Lankan Engineering Batches through Collaborative Open-Source Software Development.**
+## Getting Started
 
-OpenCircle (OC) is an open-source platform designed for faculity of IT batch 23 University of Moratuwa. It bridges the gap between academics and industry readiness by orchestrating student-led, open-source software projects to prepare every student for upcoming software engineering internships.
+First, run the development server:
 
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## 🚀 Key Features
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-* **📦 Running Projects Dashboard:** Real-time visibility into active batch repositories, maintainer contacts, contributor stacks, and status tags (`Seeking Contributors` / `Solid Team`).
-* **💡 Proposal Queue & Upvoting:** Session-authenticated community upvoting system where maintainers pitch new project ideas before moving them into active development.
-* **📈 Automated Tier Ranking Engine:** Calculates project tiers automatically using real-time GitHub REST/GraphQL API data and Webhooks.
-* **🎓 Help Desk & Event Hub:** Archive of weekly live sessions, technical workshops, YouTube recordings, and upcoming community events.
-* **📜 Transparency & Governance Rules:** Clear contribution pathways to elevate general contributors into Permanent Collaborators and Maintainers.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
----
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## 🛡️ Project Tier System
+## Learn More
 
-Projects progress through seven distinct ranks based on code quality, contributor diversity, and maintainer SLAs:
+To learn more about Next.js, take a look at the following resources:
 
-[ Warrior ]  --->  [ Elite ]  --->  [ Master ]  --->  [ GrandMaster ]  --->  [ Epic ]  --->  [ Legend ]  --->  [ Mythic ]
-(Initial MVP)     (Active Dev)     (Production)     (Batch Benchmark)     (Ecosystem)    (Community Icon)   (Hall of Fame)
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## 👥 How to Join & Contribute
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### Step 1: Browse Open Projects
-Navigate to `/Projects` on the OpenCircle platform and read through the `README.md` and `DEVELOPER.md` files of active repositories.
+## Deploy on Vercel
 
-### Step 2: Pick an Issue
-Look for issues tagged with `good-first-issue` on the project's GitHub repository. Comment on the issue to request assignment.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-### Step 3: Submit a Pull Request (PR)
-Create a separate feature branch in your fork, implement the fix or feature, and submit a PR.
-
-### Step 4: Permanent Collaborator Status
-Once you have **3 merged PRs** (non-trivial) and participate in public discussions, you earn the **Permanent Collaborator** badge and direct branch write access!
-
----
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
