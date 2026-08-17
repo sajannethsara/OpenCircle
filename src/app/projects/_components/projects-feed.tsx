@@ -10,7 +10,7 @@ const sampleProjects = [
     id: "oc-platform",
     title: "OpenCircle Platform",
     description: "The official web platform orchestrating student projects, rank calculation, and event hubs.",
-    tier: "Mythical Glory",
+    rankingId: "mythical-glory",
     contributors: 24,
     prs: 1040,
     tags: ["Next.js", "TypeScript", "Tailwind CSS", "Shadcn"],
@@ -20,7 +20,7 @@ const sampleProjects = [
     id: "batch-benchmark",
     title: "Batch Benchmark Engine",
     description: "Automated benchmark suite evaluating code quality, PR resolution SLAs, and repo health.",
-    tier: "Grand Master",
+    rankingId: "grandmaster",
     contributors: 12,
     prs: 84,
     tags: ["Node.js", "GraphQL", "GitHub API"],
@@ -30,7 +30,7 @@ const sampleProjects = [
     id: "help-desk-bot",
     title: "HelpDesk Discord Bot",
     description: "Discord bot archiving public queries into GitHub Discussions and tagging batch maintainers.",
-    tier: "Elite",
+    rankingId: "elite",
     contributors: 5,
     prs: 22,
     tags: ["Python", "Discord.py", "REST API"],
@@ -40,7 +40,7 @@ const sampleProjects = [
     id: "algo-vault",
     title: "Data Structures & Algorithms Vault",
     description: "Curated solution repository with automated test runners for interview prep.",
-    tier: "Mythic",
+    rankingId: "mythic",
     contributors: 18,
     prs: 512,
     tags: ["C++", "Python", "GitHub Actions"],
@@ -50,7 +50,7 @@ const sampleProjects = [
     id: "dev-hub-cli",
     title: "OpenCircle Dev CLI",
     description: "Command line tool for local project scaffolding and webhook payload testing.",
-    tier: "Master",
+    rankingId: "master",
     contributors: 8,
     prs: 48,
     tags: ["Go", "CLI", "Docker"],
@@ -60,7 +60,7 @@ const sampleProjects = [
     id: "campus-connect",
     title: "Faculty Campus Hub",
     description: "Student directory and peer-to-peer mentoring calendar.",
-    tier: "Warrior",
+    rankingId: "warrior",
     contributors: 4,
     prs: 6,
     tags: ["React", "Express", "PostgreSQL"],
@@ -98,28 +98,32 @@ export function ProjectsFeed() {
       {/* Project Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {sampleProjects.map((project) => {
-          const badgeSrc = Ranking.getBadgeSrc(project.tier)
-          const glowClass = Ranking.getGlowClass(project.tier)
+          const rankInfo = Ranking.getByName(project.rankingId)
+          const badgeSrc = Ranking.getBadgeSrc(project.rankingId)
+          const glowClass = Ranking.getGlowClass(project.rankingId)
+
           return (
             <div key={project.id} className="rounded-xl border border-border/60 bg-card p-5 flex flex-col justify-between space-y-4 hover:border-border transition-colors shadow-sm">
               <div className="space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2 font-semibold text-foreground">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-2.5 font-semibold text-foreground">
                     <FolderGit2 className="h-5 w-5 shrink-0" />
-                    <span className="truncate">{project.title}</span>
+                    <span className="truncate text-base">{project.title}</span>
                   </div>
-                  <span className="inline-flex items-center gap-1.5 rounded border border-border/60 bg-muted/50 px-2 py-1 text-xs font-semibold shrink-0">
-                    <div className="relative h-4 w-4 shrink-0 flex items-center justify-center">
-                      <div className={`absolute -inset-1 rounded-full blur-sm opacity-80 pointer-events-none ${glowClass}`} />
-                      <Image
-                        src={badgeSrc}
-                        alt={project.tier}
-                        fill
-                        className="object-contain relative z-10"
-                      />
-                    </div>
-                    <span>{project.tier}</span>
-                  </span>
+
+                  {/* Only PNG Badge with Radial Glow (No text, No card border) */}
+                  <div
+                    className="relative h-9 w-9 shrink-0 flex items-center justify-center"
+                    title={rankInfo?.name || project.rankingId}
+                  >
+                    <div className={`absolute -inset-1.5 rounded-full blur-md opacity-85 pointer-events-none ${glowClass}`} />
+                    <Image
+                      src={badgeSrc}
+                      alt={rankInfo?.name || project.rankingId}
+                      fill
+                      className="object-contain relative z-10 filter drop-shadow-sm"
+                    />
+                  </div>
                 </div>
 
                 <p className="text-xs text-muted-foreground leading-relaxed">

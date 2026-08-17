@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import {
   CircleDot,
@@ -80,7 +81,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, [isRulesActive])
 
   const handleParentClick = (e: React.MouseEvent) => {
-    // Ensure section opens on click
     if (!rulesOpen) {
       setRulesOpen(true)
     }
@@ -88,21 +88,32 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar variant="sidebar" collapsible="icon" {...props}>
-      <SidebarHeader className="border-b border-border/40 px-4 py-3">
-        <Link href="/" className="flex items-center gap-3 font-semibold text-foreground">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground text-background font-mono text-sm font-bold shadow-sm">
-            OC
+      {/* Header with OS.svg logo */}
+      <SidebarHeader className="border-b border-border/40 p-2 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+        <Link
+          href="/"
+          className="flex items-center gap-3 font-semibold text-foreground px-2 py-1 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-full transition-all"
+        >
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-background p-1.5 shadow-sm">
+            <Image
+              src="/OS.svg"
+              alt="OpenCircle Logo"
+              width={20}
+              height={20}
+              className="h-5 w-5 object-contain shrink-0"
+              priority
+            />
           </div>
-          <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="text-sm font-bold leading-tight tracking-tight">OpenCircle</span>
-            <span className="text-[11px] font-medium text-muted-foreground">Platform ⭕</span>
+          <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
+            <span className="text-sm font-bold leading-tight tracking-tight truncate">OpenCircle</span>
+            <span className="text-[11px] font-medium text-muted-foreground truncate">Platform ⭕</span>
           </div>
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-2">
+      <SidebarContent className="px-2 py-2 group-data-[collapsible=icon]:px-0">
         {/* Platform Navigation Group */}
-        <SidebarGroup>
+        <SidebarGroup className="group-data-[collapsible=icon]:px-0">
           <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground group-data-[collapsible=icon]:hidden">
             Platform Navigation
           </SidebarGroupLabel>
@@ -150,7 +161,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               <span className="text-sm">Rules & Ranks</span>
                             </div>
                             <ChevronRight
-                              className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
+                              className={`h-4 w-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden ${
                                 rulesOpen ? "rotate-90" : ""
                               }`}
                             />
@@ -219,9 +230,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-border/40 p-2">
-        <div className="flex items-center gap-3 rounded-md p-2 hover:bg-accent/50 transition-colors">
-          <Avatar className="h-7 w-7 border border-border">
+      <SidebarFooter className="border-t border-border/40 p-2 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+        <div className="flex items-center gap-3 rounded-md p-2 hover:bg-accent/50 transition-colors group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center">
+          <Avatar className="h-7 w-7 border border-border shrink-0">
             <AvatarFallback className="text-[10px] font-bold bg-muted">B23</AvatarFallback>
           </Avatar>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
