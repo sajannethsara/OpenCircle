@@ -1,0 +1,43 @@
+/* ==========================================================================
+   OpenCircle Rank Glow & Theme Radial Gradients
+   ========================================================================== */
+
+/* #1 Warrior - Bronze & Warm Copper */
+.rank-glow-warrior {
+  background: radial-gradient(circle, rgba(184, 115, 51, 0.35) 0%, rgba(112, 59, 21, 0.1) 55%, transparent 75%);
+}
+
+/* #2 Elite - Silver & Frosted Steel Blue */
+.rank-glow-elite {
+  background: radial-gradient(circle, rgba(142, 172, 205, 0.35) 0%, rgba(68, 93, 128, 0.1) 55%, transparent 75%);
+}
+
+/* #3 Master - Classic Bright Gold & Amber */
+.rank-glow-master {
+  background: radial-gradient(circle, rgba(255, 193, 7, 0.35) 0%, rgba(180, 115, 0, 0.1) 55%, transparent 75%);
+}
+
+/* #4 Grand Master - Platinum Ice & Cyan Blue */
+.rank-glow-grandmaster {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(30, 58, 138, 0.15) 55%, transparent 75%);
+}
+
+/* #5 Epic - Jade & Mint Emerald */
+.rank-glow-epic {
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.35) 0%, rgba(13, 94, 68, 0.12) 55%, transparent 75%);
+}
+
+/* #6 Legend - Royal Gold & Crimson/Cobalt */
+.rank-glow-legend {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.4) 0%, rgba(185, 28, 28, 0.2) 45%, transparent 75%);
+}
+
+/* #7 Mythic - Mystic Gold & Amethyst Pink */
+.rank-glow-mythic {
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.35) 0%, rgba(217, 119, 6, 0.2) 50%, transparent 75%);
+}
+
+/* #8 Mythical Glory - Void Purple, Magenta & Gold */
+.rank-glow-mythicalglory {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(234, 179, 8, 0.2) 50%, transparent 75%);
+}
