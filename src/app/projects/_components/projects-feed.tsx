@@ -121,6 +121,7 @@ export function ProjectsFeed() {
                       src={badgeSrc}
                       alt={rankInfo?.name || project.rankingId}
                       fill
+                      sizes="36px"
                       className="object-contain relative z-10 filter drop-shadow-sm"
                     />
                   </div>

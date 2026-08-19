@@ -38,6 +38,7 @@ export function RulesOverview() {
                   src={t.badgeSrc}
                   alt={t.name}
                   fill
+                  sizes="(max-width: 640px) 80px, 96px"
                   className="object-contain filter drop-shadow-md relative z-10"
                 />
               </div>
@@ -80,6 +81,7 @@ export function RulesOverview() {
                   src={t.badgeSrc}
                   alt={t.name}
                   fill
+                  sizes="(max-width: 640px) 80px, 96px"
                   className="object-contain filter drop-shadow-md relative z-10"
                 />
               </div>
@@ -122,6 +124,7 @@ export function RulesOverview() {
                           src={row.badgeSrc}
                           alt={row.name}
                           fill
+                          sizes="32px"
                           className="object-contain relative z-10"
                         />
                       </div>
