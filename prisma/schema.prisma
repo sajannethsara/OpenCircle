@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProjectType {
+  running
+  upcoming
+  custom
+}
+enum RankBadge {
+  warrior
+  elite
+  master
+  grandmaster
+  epic
+  legend
+  mythic
+  mythicalglory
+}
+
+model Project {
+  id          String      @id @default(dbgenerated("gen_random_uuid()"))
+  name        String      @default("")
+  description String      @default("")
+  githubUrl   String      @map("github_url")
+  branch      String      @default("main")
+  readmeUrl   String      @default("") @map("readme_url")
+  docFolder   String      @default("docs") @map("doc_folder")
+  type        ProjectType @default(upcoming)
+  score       Int         @default(0)
+  badge       RankBadge   @default(warrior)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("projects")
+}
+
