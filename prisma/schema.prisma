@@ -15,6 +15,7 @@ datasource db {
 enum ProjectType {
   running
   upcoming
+  pending
   custom
 }
 enum RankBadge {
@@ -36,7 +37,7 @@ model Project {
   branch      String      @default("main")
   readmeUrl   String      @default("") @map("readme_url")
   docFolder   String      @default("docs") @map("doc_folder")
-  type        ProjectType @default(upcoming)
+  type        ProjectType @default(pending)
   score       Int         @default(0)
   badge       RankBadge   @default(warrior)
 
@@ -45,4 +46,20 @@ model Project {
 
   @@map("projects")
 }
+
+model Event {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  title     String
+  date      String
+  time      String
+  speaker   String
+  type      String   @default("Workshop")
+  status    String   @default("Upcoming")
+  link      String   @default("")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("events")
+}
+
 
