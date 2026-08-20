@@ -41,6 +41,8 @@ const adminNavItems = [
   },
 ]
 
+import { OpenCircleLogo } from "@/components/oc-logo"
+
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const router = useRouter()
@@ -67,9 +69,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
           href="/admin/projects"
           className="flex items-center gap-3 font-semibold text-foreground px-2 py-1 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-full transition-all"
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground p-1.5 shadow-sm">
-            <ShieldCheck className="h-5 w-5 shrink-0" />
-          </div>
+          <OpenCircleLogo className="h-8 w-8 shrink-0 text-foreground" />
           <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
             <span className="text-sm font-bold leading-tight tracking-tight truncate">OpenCircle</span>
             <span className="text-[11px] font-semibold text-primary truncate">Admin Panel 🔒</span>

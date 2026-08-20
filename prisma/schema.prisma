@@ -50,12 +50,10 @@ model Project {
 model Event {
   id        String   @id @default(dbgenerated("gen_random_uuid()"))
   title     String
-  date      String
-  time      String
+  eventDate DateTime @map("event_date")
   speaker   String
-  type      String   @default("Workshop")
-  status    String   @default("Upcoming")
   link      String   @default("")
+  notesMd   String   @default("") @map("notes_md")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

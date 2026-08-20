@@ -3,36 +3,31 @@
 import * as React from "react"
 import { Calendar, Video, Clock, ExternalLink, HelpCircle, Loader2 } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { MdxViewer } from "@/components/mdx"
 
 interface EventItem {
   id?: string
   title: string
-  date: string
-  time: string
+  eventDate: string
   speaker: string
-  type: string
-  status?: string
   link?: string
+  notesMd?: string
 }
 
 const fallbackEvents: EventItem[] = [
   {
     id: "fb-1",
     title: "GitHub Actions & CI/CD Pipeline Workshop",
-    date: "Aug 22, 2026",
-    time: "7:00 PM - 8:30 PM",
+    eventDate: "2026-08-22T19:00:00.000Z",
     speaker: "Batch 23 DevOps Lead",
-    type: "Workshop",
-    status: "Upcoming",
+    notesMd: "In this hands-on workshop, we'll build automated CI/CD workflows for Next.js applications.",
   },
   {
     id: "fb-2",
     title: "OpenCircle Project Proposal Pitch Session",
-    date: "Aug 26, 2026",
-    time: "6:00 PM - 7:30 PM",
+    eventDate: "2026-08-26T18:00:00.000Z",
     speaker: "Batch Maintainers Board",
-    type: "Community Event",
-    status: "Upcoming",
+    notesMd: "Present your open-source project ideas to the community and find maintainer co-founders.",
   },
 ]
 
@@ -74,7 +69,7 @@ export function EventsHub() {
         {/* Events Feed (2 Cols) */}
         <div className="lg:col-span-2 space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-muted-foreground" />
+            <Calendar className="h-5 w-5 text-primary" />
             Upcoming Live Sessions
           </h2>
 
@@ -85,47 +80,63 @@ export function EventsHub() {
             </div>
           ) : (
             <div className="space-y-4">
-              {events.map((event, index) => (
-                <div key={event.id || index} className="rounded-xl border border-border/60 bg-card p-5 space-y-3 shadow-sm">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <span className="inline-block rounded bg-accent px-2 py-0.5 text-[10px] font-mono font-medium text-accent-foreground mb-1">
-                        {event.type}
-                      </span>
-                      <h3 className="text-base font-semibold text-foreground">{event.title}</h3>
+              {events.map((event, index) => {
+                const dateObj = new Date(event.eventDate)
+                const isValidDate = !isNaN(dateObj.getTime())
+                const formattedDate = isValidDate
+                  ? dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                  : event.eventDate
+                const formattedTime = isValidDate
+                  ? dateObj.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+                  : ""
+
+                return (
+                  <div key={event.id || index} className="rounded-xl border border-border/60 bg-card p-5 space-y-3 shadow-sm">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h3 className="text-base font-semibold text-foreground">{event.title}</h3>
+                      </div>
+                      {event.link ? (
+                        <a
+                          href={event.link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={buttonVariants({ variant: "outline", size: "sm" })}
+                        >
+                          Join Session
+                        </a>
+                      ) : (
+                        <Button size="sm" variant="outline">
+                          Set Reminder
+                        </Button>
+                      )}
                     </div>
-                    {event.link ? (
-                      <a
-                        href={event.link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={buttonVariants({ variant: "outline", size: "sm" })}
-                      >
-                        Join Session
-                      </a>
-                    ) : (
-                      <Button size="sm" variant="outline">
-                        Set Reminder
-                      </Button>
+
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground border-t border-border/40 pt-3">
+                      <span className="flex items-center gap-1.5 font-medium text-foreground">
+                        <Calendar className="h-3.5 w-3.5 text-primary" />
+                        {formattedDate}
+                      </span>
+                      {formattedTime && (
+                        <span className="flex items-center gap-1.5 font-medium text-foreground">
+                          <Clock className="h-3.5 w-3.5 text-primary" />
+                          {formattedTime}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5">
+                        <Video className="h-3.5 w-3.5" />
+                        {event.speaker}
+                      </span>
+                    </div>
+
+                    {event.notesMd && (
+                      <div className="border-t border-border/40 pt-3 text-xs text-muted-foreground">
+                        <MdxViewer content={event.notesMd} />
+                      </div>
                     )}
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground border-t border-border/40 pt-3">
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5" />
-                      {event.date}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5" />
-                      {event.time}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Video className="h-3.5 w-3.5" />
-                      {event.speaker}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

@@ -12,6 +12,7 @@ import {
   AlertCircle,
   ExternalLink,
   Search,
+  FileText,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,12 +28,10 @@ import {
 export interface EventData {
   id: string
   title: string
-  date: string
-  time: string
+  eventDate: string
   speaker: string
-  type: string
-  status: string
   link: string
+  notesMd: string
   createdAt: string
 }
 
@@ -45,23 +44,19 @@ export function AdminEventsManager() {
   // Add Event State
   const [addDialogOpen, setAddDialogOpen] = React.useState(false)
   const [titleInput, setTitleInput] = React.useState("")
-  const [dateInput, setDateInput] = React.useState("")
-  const [timeInput, setTimeInput] = React.useState("7:00 PM - 8:30 PM")
+  const [eventDateInput, setEventDateInput] = React.useState("")
   const [speakerInput, setSpeakerInput] = React.useState("Batch 23 Lead")
-  const [typeInput, setTypeInput] = React.useState("Workshop")
-  const [statusInput, setStatusInput] = React.useState("Upcoming")
   const [linkInput, setLinkInput] = React.useState("")
+  const [notesMdInput, setNotesMdInput] = React.useState("")
   const [submitting, setSubmitting] = React.useState(false)
 
   // Edit Event State
   const [editingEvent, setEditingEvent] = React.useState<EventData | null>(null)
   const [editTitle, setEditTitle] = React.useState("")
-  const [editDate, setEditDate] = React.useState("")
-  const [editTime, setEditTime] = React.useState("")
+  const [editEventDate, setEditEventDate] = React.useState("")
   const [editSpeaker, setEditSpeaker] = React.useState("")
-  const [editType, setEditType] = React.useState("")
-  const [editStatus, setEditStatus] = React.useState("")
   const [editLink, setEditLink] = React.useState("")
+  const [editNotesMd, setEditNotesMd] = React.useState("")
   const [updating, setUpdating] = React.useState(false)
 
   const fetchEvents = React.useCallback(async () => {
@@ -89,7 +84,7 @@ export function AdminEventsManager() {
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!titleInput.trim() || !dateInput.trim()) return
+    if (!titleInput.trim() || !eventDateInput.trim()) return
 
     setSubmitting(true)
     try {
@@ -98,12 +93,10 @@ export function AdminEventsManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: titleInput.trim(),
-          date: dateInput.trim(),
-          time: timeInput.trim(),
+          eventDate: eventDateInput,
           speaker: speakerInput.trim(),
-          type: typeInput.trim(),
-          status: statusInput.trim(),
           link: linkInput.trim(),
+          notesMd: notesMdInput.trim(),
         }),
       })
 
@@ -114,12 +107,10 @@ export function AdminEventsManager() {
 
       setAddDialogOpen(false)
       setTitleInput("")
-      setDateInput("")
-      setTimeInput("7:00 PM - 8:30 PM")
+      setEventDateInput("")
       setSpeakerInput("Batch 23 Lead")
-      setTypeInput("Workshop")
-      setStatusInput("Upcoming")
       setLinkInput("")
+      setNotesMdInput("")
       fetchEvents()
     } catch (err) {
       alert(err instanceof Error ? err.message : "Error creating event")
@@ -131,12 +122,15 @@ export function AdminEventsManager() {
   const handleOpenEdit = (event: EventData) => {
     setEditingEvent(event)
     setEditTitle(event.title)
-    setEditDate(event.date)
-    setEditTime(event.time)
+    // format to ISO local datetime format for input: YYYY-MM-DDTHH:mm
+    const dateObj = new Date(event.eventDate)
+    const formatted = !isNaN(dateObj.getTime())
+      ? dateObj.toISOString().slice(0, 16)
+      : ""
+    setEditEventDate(formatted)
     setEditSpeaker(event.speaker)
-    setEditType(event.type)
-    setEditStatus(event.status)
     setEditLink(event.link)
+    setEditNotesMd(event.notesMd || "")
   }
 
   const handleSaveEdit = async (e: React.FormEvent) => {
@@ -150,12 +144,10 @@ export function AdminEventsManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: editTitle,
-          date: editDate,
-          time: editTime,
+          eventDate: editEventDate,
           speaker: editSpeaker,
-          type: editType,
-          status: editStatus,
           link: editLink,
+          notesMd: editNotesMd,
         }),
       })
 
@@ -194,7 +186,7 @@ export function AdminEventsManager() {
   const filteredEvents = events.filter((e) =>
     e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     e.speaker.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    e.type.toLowerCase().includes(searchQuery.toLowerCase())
+    (e.notesMd && e.notesMd.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   return (
@@ -207,7 +199,7 @@ export function AdminEventsManager() {
             Manage Events
           </h1>
           <p className="text-sm text-muted-foreground">
-            Schedule workshops, live technical sessions, project proposal pitches, and community events.
+            Schedule workshops, live technical sessions, pitches, and maintain event markdown notes.
           </p>
         </div>
 
@@ -221,11 +213,11 @@ export function AdminEventsManager() {
               </Button>
             }
           />
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Schedule New Event</DialogTitle>
               <DialogDescription>
-                Fill in session details for live workshops, community meetups, or pitches.
+                Specify the exact date and time for the event along with speaker info and markdown notes.
               </DialogDescription>
             </DialogHeader>
 
@@ -233,7 +225,7 @@ export function AdminEventsManager() {
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-foreground">Event Title</label>
                 <Input
-                  placeholder="e.g., GitHub Actions & CI/CD Workshop"
+                  placeholder="e.g., GitHub Actions & CI/CD Pipeline Workshop"
                   value={titleInput}
                   onChange={(e) => setTitleInput(e.target.value)}
                   required
@@ -242,25 +234,14 @@ export function AdminEventsManager() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Date</label>
+                  <label className="text-xs font-semibold text-foreground">Date & Time</label>
                   <Input
-                    placeholder="Aug 25, 2026"
-                    value={dateInput}
-                    onChange={(e) => setDateInput(e.target.value)}
+                    type="datetime-local"
+                    value={eventDateInput}
+                    onChange={(e) => setEventDateInput(e.target.value)}
                     required
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Time</label>
-                  <Input
-                    placeholder="7:00 PM - 8:30 PM"
-                    value={timeInput}
-                    onChange={(e) => setTimeInput(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-foreground">Speaker / Host</label>
                   <Input
@@ -269,27 +250,25 @@ export function AdminEventsManager() {
                     onChange={(e) => setSpeakerInput(e.target.value)}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Event Type</label>
-                  <select
-                    value={typeInput}
-                    onChange={(e) => setTypeInput(e.target.value)}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs text-foreground"
-                  >
-                    <option value="Workshop">Workshop</option>
-                    <option value="Community Event">Community Event</option>
-                    <option value="Pitch Session">Pitch Session</option>
-                    <option value="Q&A Session">Q&A Session</option>
-                  </select>
-                </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Live Link / Meeting URL (Optional)</label>
+                <label className="text-xs font-semibold text-foreground">Meeting / Video Link (Optional)</label>
                 <Input
                   placeholder="https://meet.google.com/..."
                   value={linkInput}
                   onChange={(e) => setLinkInput(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Event Notes (Markdown)</label>
+                <textarea
+                  rows={4}
+                  placeholder="Add session agenda, prerequisites, or notes in markdown..."
+                  value={notesMdInput}
+                  onChange={(e) => setNotesMdInput(e.target.value)}
+                  className="w-full rounded-md border border-input bg-background p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 />
               </div>
 
@@ -312,7 +291,7 @@ export function AdminEventsManager() {
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search events by title or speaker..."
+            placeholder="Search events..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 h-9 text-xs"
@@ -348,80 +327,90 @@ export function AdminEventsManager() {
       {/* Events List */}
       {!loading && !error && filteredEvents.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredEvents.map((event) => (
-            <div key={event.id} className="rounded-xl border border-border/60 bg-card p-5 space-y-3 shadow-sm flex flex-col justify-between">
-              <div className="space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <span className="inline-block rounded bg-accent px-2 py-0.5 text-[10px] font-mono font-medium text-accent-foreground mb-1">
-                      {event.type}
+          {filteredEvents.map((event) => {
+            const dateObj = new Date(event.eventDate)
+            const isValidDate = !isNaN(dateObj.getTime())
+            const formattedDate = isValidDate
+              ? dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+              : event.eventDate
+            const formattedTime = isValidDate
+              ? dateObj.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+              : ""
+
+            return (
+              <div key={event.id} className="rounded-xl border border-border/60 bg-card p-5 space-y-3 shadow-sm flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="text-base font-semibold text-foreground">{event.title}</h3>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                        onClick={() => handleOpenEdit(event)}
+                        title="Edit Event"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDelete(event.id, event.title)}
+                        title="Delete Event"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground border-t border-border/40 pt-3">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 text-primary" />
+                      {formattedDate} {formattedTime && `at ${formattedTime}`}
                     </span>
-                    <h3 className="text-base font-semibold text-foreground">{event.title}</h3>
+                    <span className="flex items-center gap-1.5">
+                      <Video className="h-3.5 w-3.5" />
+                      {event.speaker}
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-1">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-                      onClick={() => handleOpenEdit(event)}
-                      title="Edit Event"
-                    >
-                      <Edit className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => handleDelete(event.id, event.title)}
-                      title="Delete Event"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
+                  {event.notesMd && (
+                    <div className="text-xs text-muted-foreground/80 bg-muted/40 p-2.5 rounded-md border border-border/30 line-clamp-3 font-mono text-[11px]">
+                      {event.notesMd}
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground border-t border-border/40 pt-3">
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {event.date}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5" />
-                    {event.time}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Video className="h-3.5 w-3.5" />
-                    {event.speaker}
-                  </span>
-                </div>
+                {event.link && (
+                  <div className="border-t border-border/40 pt-2 flex justify-end">
+                    <a
+                      href={event.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                    >
+                      <span>Join Session</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
               </div>
-
-              {event.link && (
-                <div className="border-t border-border/40 pt-2 flex justify-end">
-                  <a
-                    href={event.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                  >
-                    <span>Join Session</span>
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                </div>
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
       {/* Edit Event Dialog */}
       {editingEvent && (
         <Dialog open={Boolean(editingEvent)} onOpenChange={() => setEditingEvent(null)}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Edit Event</DialogTitle>
-              <DialogDescription>Update session title, timing, host, or meeting link.</DialogDescription>
+              <DialogDescription>Update session title, date & time, host, meeting link, or notes.</DialogDescription>
             </DialogHeader>
 
             <form onSubmit={handleSaveEdit} className="space-y-3.5 pt-2">
@@ -436,23 +425,14 @@ export function AdminEventsManager() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Date</label>
+                  <label className="text-xs font-semibold text-foreground">Date & Time</label>
                   <Input
-                    value={editDate}
-                    onChange={(e) => setEditDate(e.target.value)}
+                    type="datetime-local"
+                    value={editEventDate}
+                    onChange={(e) => setEditEventDate(e.target.value)}
                     required
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Time</label>
-                  <Input
-                    value={editTime}
-                    onChange={(e) => setEditTime(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-foreground">Speaker / Host</label>
                   <Input
@@ -460,26 +440,23 @@ export function AdminEventsManager() {
                     onChange={(e) => setEditSpeaker(e.target.value)}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Event Type</label>
-                  <select
-                    value={editType}
-                    onChange={(e) => setEditType(e.target.value)}
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-xs text-foreground"
-                  >
-                    <option value="Workshop">Workshop</option>
-                    <option value="Community Event">Community Event</option>
-                    <option value="Pitch Session">Pitch Session</option>
-                    <option value="Q&A Session">Q&A Session</option>
-                  </select>
-                </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Live Link / Meeting URL</label>
+                <label className="text-xs font-semibold text-foreground">Meeting / Video Link</label>
                 <Input
                   value={editLink}
                   onChange={(e) => setEditLink(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Event Notes (Markdown)</label>
+                <textarea
+                  rows={4}
+                  value={editNotesMd}
+                  onChange={(e) => setEditNotesMd(e.target.value)}
+                  className="w-full rounded-md border border-input bg-background p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 />
               </div>
 
@@ -489,7 +466,7 @@ export function AdminEventsManager() {
                 </Button>
                 <Button type="submit" disabled={updating}>
                   {updating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Event Changes
+                  Save Changes
                 </Button>
               </div>
             </form>

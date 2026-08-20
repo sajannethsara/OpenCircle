@@ -7,6 +7,8 @@ import { ShieldCheck, Lock, User, Loader2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
+import { OpenCircleLogo } from "@/components/oc-logo"
+
 export default function AdminLoginPage() {
   const router = useRouter()
   const [username, setUsername] = React.useState("")
@@ -48,16 +50,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md space-y-6 p-8 rounded-xl border border-border/60 bg-card shadow-lg">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-foreground text-background shadow-md mb-2">
-            <Image
-              src="/OS.svg"
-              alt="OpenCircle Logo"
-              width={28}
-              height={28}
-              className="h-7 w-7 object-contain"
-              priority
-            />
-          </div>
+          <OpenCircleLogo className="h-10 w-10 text-foreground mx-auto mb-2" />
           <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center justify-center gap-2">
             <ShieldCheck className="h-6 w-6 text-primary" />
             Admin Portal

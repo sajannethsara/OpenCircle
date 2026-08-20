@@ -4,8 +4,8 @@ const ADMIN_COOKIE_NAME = "opencircle_admin_session"
 
 export function getAdminCredentials() {
   return {
-    username: process.env.ADMIN_USER || process.env.ADMIN_USERNAME || "raju",
-    password: process.env.ADMIN_PSW || process.env.ADMIN_PASSWORD || "ujar1234",
+    username: process.env.ADMIN_USER || process.env.ADMIN_USERNAME,
+    password: process.env.ADMIN_PSW || process.env.ADMIN_PASSWORD,
   }
 }
 

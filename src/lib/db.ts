@@ -6,9 +6,13 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
+const DEFAULT_DB_URL =
+  "postgresql://neondb_owner:npg_YI0EiRZHj1Dw@ep-lingering-river-azpvr3d2-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+
 function createPrismaClient() {
+  const connectionString = process.env.DB_URL || process.env.DATABASE_URL || DEFAULT_DB_URL;
   const pool = new pg.Pool({
-    connectionString: process.env.DB_URL,
+    connectionString,
   });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });

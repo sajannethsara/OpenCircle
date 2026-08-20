@@ -18,17 +18,16 @@ export async function PATCH(
     const { id } = await params
     const body = await request.json()
 
+    const updateData: Record<string, unknown> = {}
+    if (body.title !== undefined) updateData.title = body.title
+    if (body.eventDate !== undefined) updateData.eventDate = new Date(body.eventDate)
+    if (body.speaker !== undefined) updateData.speaker = body.speaker
+    if (body.link !== undefined) updateData.link = body.link
+    if (body.notesMd !== undefined) updateData.notesMd = body.notesMd
+
     const updatedEvent = await db.event.update({
       where: { id },
-      data: {
-        ...(body.title !== undefined && { title: body.title }),
-        ...(body.date !== undefined && { date: body.date }),
-        ...(body.time !== undefined && { time: body.time }),
-        ...(body.speaker !== undefined && { speaker: body.speaker }),
-        ...(body.type !== undefined && { type: body.type }),
-        ...(body.status !== undefined && { status: body.status }),
-        ...(body.link !== undefined && { link: body.link }),
-      },
+      data: updateData,
     })
 
     return NextResponse.json({

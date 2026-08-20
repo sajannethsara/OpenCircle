@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/collapsible"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
+import { OpenCircleLogo } from "@/components/oc-logo"
+
 const platformNavItems = [
   {
     title: "Home",
@@ -109,22 +111,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar variant="sidebar" collapsible="icon" {...props}>
-      {/* Header with OS.svg logo */}
+      {/* Header with OpenCircle logo */}
       <SidebarHeader className="border-b border-border/40 p-2 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
         <Link
           href="/"
           className="flex items-center gap-3 font-semibold text-foreground px-2 py-1 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-full transition-all"
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-background p-1.5 shadow-sm">
-            <Image
-              src="/OS.svg"
-              alt="OpenCircle Logo"
-              width={20}
-              height={20}
-              className="h-5 w-5 object-contain shrink-0"
-              priority
-            />
-          </div>
+          <OpenCircleLogo className="h-8 w-8 shrink-0 text-foreground" />
           <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
             <span className="text-sm font-bold leading-tight tracking-tight truncate">OpenCircle</span>
             <span className="text-[11px] font-medium text-muted-foreground truncate">Platform ⭕</span>
