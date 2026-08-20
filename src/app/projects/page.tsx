@@ -1,5 +1,5 @@
-import { ProjectsFeed } from "./_components/projects-feed";
+import { redirect } from "next/navigation";
 
 export default function ProjectsPage() {
-  return <ProjectsFeed />;
+  redirect("/projects/running");
 }

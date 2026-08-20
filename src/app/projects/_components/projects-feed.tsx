@@ -1,163 +1,241 @@
+"use client"
+
 import * as React from "react"
-import Image from "next/image"
-import { FolderGit2, GitFork, Users, Plus } from "lucide-react"
+import { FolderGit2, Plus, Loader2, Search, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Ranking } from "@/lib/rankings"
+import { ProjectCard, ProjectData } from "./project-card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
-const sampleProjects = [
-  {
-    id: "oc-platform",
-    title: "OpenCircle Platform",
-    description: "The official web platform orchestrating student projects, rank calculation, and event hubs.",
-    rankingId: "mythical-glory",
-    contributors: 24,
-    prs: 1040,
-    tags: ["Next.js", "TypeScript", "Tailwind CSS", "Shadcn"],
-    status: "Seeking Contributors",
-  },
-  {
-    id: "batch-benchmark",
-    title: "Batch Benchmark Engine",
-    description: "Automated benchmark suite evaluating code quality, PR resolution SLAs, and repo health.",
-    rankingId: "grandmaster",
-    contributors: 12,
-    prs: 84,
-    tags: ["Node.js", "GraphQL", "GitHub API"],
-    status: "Solid Team",
-  },
-  {
-    id: "help-desk-bot",
-    title: "HelpDesk Discord Bot",
-    description: "Discord bot archiving public queries into GitHub Discussions and tagging batch maintainers.",
-    rankingId: "elite",
-    contributors: 5,
-    prs: 22,
-    tags: ["Python", "Discord.py", "REST API"],
-    status: "Seeking Contributors",
-  },
-  {
-    id: "algo-vault",
-    title: "Data Structures & Algorithms Vault",
-    description: "Curated solution repository with automated test runners for interview prep.",
-    rankingId: "mythic",
-    contributors: 18,
-    prs: 512,
-    tags: ["C++", "Python", "GitHub Actions"],
-    status: "Solid Team",
-  },
-  {
-    id: "dev-hub-cli",
-    title: "OpenCircle Dev CLI",
-    description: "Command line tool for local project scaffolding and webhook payload testing.",
-    rankingId: "master",
-    contributors: 8,
-    prs: 48,
-    tags: ["Go", "CLI", "Docker"],
-    status: "Seeking Contributors",
-  },
-  {
-    id: "campus-connect",
-    title: "Faculty Campus Hub",
-    description: "Student directory and peer-to-peer mentoring calendar.",
-    rankingId: "warrior",
-    contributors: 4,
-    prs: 6,
-    tags: ["React", "Express", "PostgreSQL"],
-    status: "Seeking Contributors",
-  },
-]
+interface ProjectsFeedProps {
+  projectType?: "running" | "upcoming"
+}
 
-export function ProjectsFeed() {
+export function ProjectsFeed({ projectType = "running" }: ProjectsFeedProps) {
+  const isRunning = projectType === "running"
+  const [projects, setProjects] = React.useState<ProjectData[]>([])
+  const [loading, setLoading] = React.useState<boolean>(true)
+  const [error, setError] = React.useState<string | null>(null)
+
+  // Search
+  const [searchQuery, setSearchQuery] = React.useState<string>("")
+
+  // Add Project Dialog Form State
+  const [dialogOpen, setDialogOpen] = React.useState<boolean>(false)
+  const [githubUrlInput, setGithubUrlInput] = React.useState<string>("")
+  const [branchInput, setBranchInput] = React.useState<string>("main")
+  const [docFolderInput, setDocFolderInput] = React.useState<string>("docs")
+  const [submitting, setSubmitting] = React.useState<boolean>(false)
+  const [formError, setFormError] = React.useState<string | null>(null)
+
+  const fetchProjects = React.useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const endpoint = isRunning ? "/api/projects/running" : "/api/projects/upcoming"
+      const res = await fetch(endpoint)
+      const data = await res.json()
+
+      if (data.success && Array.isArray(data.data)) {
+        setProjects(data.data)
+      } else {
+        throw new Error(data.error || "Failed to load projects")
+      }
+    } catch (err) {
+      console.error("Fetch projects error:", err)
+      setError(err instanceof Error ? err.message : "Error fetching projects")
+    } finally {
+      setLoading(false)
+    }
+  }, [isRunning])
+
+  React.useEffect(() => {
+    fetchProjects()
+  }, [fetchProjects])
+
+  const handleAddProject = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!githubUrlInput.trim()) return
+
+    setSubmitting(true)
+    setFormError(null)
+
+    try {
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          githubUrl: githubUrlInput.trim(),
+          branch: branchInput.trim() || "main",
+          docFolder: docFolderInput.trim() || "docs",
+          type: projectType,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to add project")
+      }
+
+      setDialogOpen(false)
+      setGithubUrlInput("")
+      setBranchInput("main")
+      setDocFolderInput("docs")
+      fetchProjects()
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Failed to add project")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const filteredProjects = projects.filter((p) =>
+    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.description.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   return (
     <div className="space-y-6">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Running Projects</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            {isRunning ? "Running Projects" : "Upcoming Projects"}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Explore active batch repositories, maintainer contacts, and open contribution tags.
+            {isRunning
+              ? "Explore active batch repositories, maintainer contacts, and open contribution tags."
+              : "Discover new project proposals, upcoming batch initiatives, and early-stage ideas awaiting contributors."}
           </p>
         </div>
-        <Button className="shrink-0">
-          <Plus className="mr-2 h-4 w-4" />
-          Propose Project
-        </Button>
+
+        {/* Add Project Modal */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger
+            render={
+              <Button className="shrink-0">
+                <Plus className="mr-2 h-4 w-4" />
+                Propose Project
+              </Button>
+            }
+          />
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Add New Project</DialogTitle>
+              <DialogDescription>
+                Provide a GitHub repository URL. Details like name, description, and README will be automatically fetched.
+              </DialogDescription>
+            </DialogHeader>
+
+            <form onSubmit={handleAddProject} className="space-y-4 pt-2">
+              {formError && (
+                <div className="p-3 rounded bg-destructive/10 text-destructive text-xs flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>{formError}</span>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">GitHub URL</label>
+                <Input
+                  placeholder="https://github.com/owner/repo"
+                  value={githubUrlInput}
+                  onChange={(e) => setGithubUrlInput(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Branch</label>
+                  <Input
+                    placeholder="main"
+                    value={branchInput}
+                    onChange={(e) => setBranchInput(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Doc Folder</label>
+                  <Input
+                    placeholder="docs"
+                    value={docFolderInput}
+                    onChange={(e) => setDocFolderInput(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={submitting}>
+                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Project
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Filter / Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center gap-3">
-        <Input placeholder="Search projects by name or stack..." className="w-full sm:w-80" />
-        <div className="flex items-center gap-2 overflow-x-auto w-full pb-1 sm:pb-0">
-          <Button variant="secondary" size="sm">All</Button>
-          <Button variant="ghost" size="sm">Seeking Contributors</Button>
-          <Button variant="ghost" size="sm">Solid Team</Button>
+      <div className="flex items-center gap-3">
+        <div className="relative w-full sm:w-80">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search projects..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
         </div>
       </div>
 
+      {/* Loading state */}
+      {loading && (
+        <div className="flex items-center justify-center p-12 text-muted-foreground gap-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span className="text-sm font-medium">Fetching projects...</span>
+        </div>
+      )}
+
+      {/* Error state */}
+      {!loading && error && (
+        <div className="flex items-center justify-center p-8 rounded-xl border border-destructive/20 bg-destructive/10 text-destructive text-sm gap-2">
+          <AlertCircle className="h-5 w-5 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && !error && filteredProjects.length === 0 && (
+        <div className="flex flex-col items-center justify-center p-12 rounded-xl border border-border/60 bg-card text-center space-y-3">
+          <FolderGit2 className="h-10 w-10 text-muted-foreground/50" />
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-foreground">No {isRunning ? "running" : "upcoming"} projects found</h3>
+            <p className="text-xs text-muted-foreground">
+              Click &quot;Propose Project&quot; above to submit a GitHub repository to the database.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Project Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {sampleProjects.map((project) => {
-          const rankInfo = Ranking.getByName(project.rankingId)
-          const badgeSrc = Ranking.getBadgeSrc(project.rankingId)
-          const glowClass = Ranking.getGlowClass(project.rankingId)
-
-          return (
-            <div key={project.id} className="rounded-xl border border-border/60 bg-card p-5 flex flex-col justify-between space-y-4 hover:border-border transition-colors shadow-sm">
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-2.5 font-semibold text-foreground">
-                    <FolderGit2 className="h-5 w-5 shrink-0" />
-                    <span className="truncate text-base">{project.title}</span>
-                  </div>
-
-                  {/* Only PNG Badge with Radial Glow (No text, No card border) */}
-                  <div
-                    className="relative h-9 w-9 shrink-0 flex items-center justify-center"
-                    title={rankInfo?.name || project.rankingId}
-                  >
-                    <div className={`absolute -inset-1.5 rounded-full blur-md opacity-85 pointer-events-none ${glowClass}`} />
-                    <Image
-                      src={badgeSrc}
-                      alt={rankInfo?.name || project.rankingId}
-                      fill
-                      className="object-contain relative z-10 filter drop-shadow-sm"
-                    />
-                  </div>
-                </div>
-
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {project.description}
-                </p>
-
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {project.tags.map((tag) => (
-                    <span key={tag} className="rounded bg-accent/60 px-2 py-0.5 text-[10px] font-mono text-accent-foreground">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="border-t border-border/40 pt-3 flex items-center justify-between text-xs text-muted-foreground">
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1">
-                    <Users className="h-3.5 w-3.5" />
-                    {project.contributors}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <GitFork className="h-3.5 w-3.5" />
-                    {project.prs} PRs
-                  </span>
-                </div>
-                <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 text-[10px] font-medium">
-                  {project.status}
-                </span>
-              </div>
-            </div>
-          )
-        })}
-      </div>
+      {!loading && !error && filteredProjects.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredProjects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
