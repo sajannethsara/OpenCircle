@@ -43,14 +43,20 @@ const platformNavItems = [
     icon: CircleDot,
   },
   {
-    title: "Projects",
-    url: "/projects",
-    icon: FolderGit2,
-  },
-  {
     title: "Events",
     url: "/events",
     icon: Calendar,
+  },
+]
+
+const projectsSubItems = [
+  {
+    title: "Running",
+    url: "/projects/running",
+  },
+  {
+    title: "Upcoming",
+    url: "/projects/upcoming",
   },
 ]
 
@@ -72,7 +78,10 @@ const rulesSubItems = [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const isRulesActive = pathname.startsWith("/rules")
+  const isProjectsActive = pathname.startsWith("/projects")
+
   const [rulesOpen, setRulesOpen] = React.useState(true)
+  const [projectsOpen, setProjectsOpen] = React.useState(true)
 
   React.useEffect(() => {
     if (isRulesActive) {
@@ -80,9 +89,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   }, [isRulesActive])
 
-  const handleParentClick = (e: React.MouseEvent) => {
+  React.useEffect(() => {
+    if (isProjectsActive) {
+      setProjectsOpen(true)
+    }
+  }, [isProjectsActive])
+
+  const handleRulesParentClick = () => {
     if (!rulesOpen) {
       setRulesOpen(true)
+    }
+  }
+
+  const handleProjectsParentClick = () => {
+    if (!projectsOpen) {
+      setProjectsOpen(true)
     }
   }
 
@@ -119,8 +140,95 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* Main Nav Items */}
-              {platformNavItems.map((item) => {
+              {/* Home */}
+              {platformNavItems.slice(0, 1).map((item) => {
+                const isActive = pathname === item.url
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      render={
+                        <Link href={item.url} className="flex items-center gap-3">
+                          <item.icon className="h-4 w-4 shrink-0" />
+                          <span className="text-sm">{item.title}</span>
+                        </Link>
+                      }
+                      isActive={isActive}
+                      tooltip={item.title}
+                      className={
+                        isActive
+                          ? "bg-accent font-medium text-accent-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }
+                    />
+                  </SidebarMenuItem>
+                )
+              })}
+
+              {/* Collapsible Projects Parent linking to /projects/running */}
+              <Collapsible open={projectsOpen} onOpenChange={setProjectsOpen} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger
+                    nativeButton={false}
+                    render={
+                      <SidebarMenuButton
+                        render={
+                          <Link
+                            href="/projects/running"
+                            onClick={handleProjectsParentClick}
+                            className="flex w-full items-center justify-between"
+                          >
+                            <div className="flex items-center gap-3">
+                              <FolderGit2 className="h-4 w-4 shrink-0" />
+                              <span className="text-sm">Projects</span>
+                            </div>
+                            <ChevronRight
+                              className={`h-4 w-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden ${
+                                projectsOpen ? "rotate-90" : ""
+                              }`}
+                            />
+                          </Link>
+                        }
+                        isActive={isProjectsActive}
+                        tooltip="Projects"
+                        className={
+                          isProjectsActive
+                            ? "font-medium text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }
+                      />
+                    }
+                  />
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {projectsSubItems.map((subItem) => {
+                        const isSubActive =
+                          pathname === subItem.url ||
+                          (subItem.url === "/projects/running" && pathname === "/projects")
+                        return (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton
+                              render={
+                                <Link href={subItem.url} className="w-full">
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              }
+                              isActive={isSubActive}
+                              className={
+                                isSubActive
+                                  ? "font-medium text-foreground bg-accent/60"
+                                  : "text-muted-foreground hover:text-foreground"
+                              }
+                            />
+                          </SidebarMenuSubItem>
+                        )
+                      })}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              {/* Remaining main items (Events) */}
+              {platformNavItems.slice(1).map((item) => {
                 const isActive = pathname === item.url || (item.url !== "/" && pathname.startsWith(item.url))
                 return (
                   <SidebarMenuItem key={item.title}>
@@ -153,7 +261,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         render={
                           <Link
                             href="/rules/ranking"
-                            onClick={handleParentClick}
+                            onClick={handleRulesParentClick}
                             className="flex w-full items-center justify-between"
                           >
                             <div className="flex items-center gap-3">
