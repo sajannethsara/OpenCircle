@@ -242,20 +242,3 @@ export class GithubRepo {
     };
   }
 }
-
-// --- Usage Example ---
-
-async function run() {
-  const githubService = new GithubRepo("https://github.com/sajannethsara/opencircle", "dev");
-
-  console.log("Username:", githubService.username);
-  console.log("Repository:", githubService.repo);
-
-  const data = await githubService.getRepo();
-  console.log("Result:", data);
-
-  const extra = await githubService.getRepoExtraData("docs");
-  console.log("Extra data:", extra);
-}
-
-run();
