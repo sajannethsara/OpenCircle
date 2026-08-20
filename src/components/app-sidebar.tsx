@@ -149,7 +149,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       render={
                         <Link href={item.url} className="flex items-center gap-3">
                           <item.icon className="h-4 w-4 shrink-0" />
-                          <span className="text-sm">{item.title}</span>
+                          <span className="text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
                         </Link>
                       }
                       isActive={isActive}
@@ -179,7 +179,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           >
                             <div className="flex items-center gap-3">
                               <FolderGit2 className="h-4 w-4 shrink-0" />
-                              <span className="text-sm">Projects</span>
+                              <span className="text-sm group-data-[collapsible=icon]:hidden">Projects</span>
                             </div>
                             <ChevronRight
                               className={`h-4 w-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden ${
@@ -198,7 +198,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       />
                     }
                   />
-                  <CollapsibleContent>
+                  <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
                     <SidebarMenuSub>
                       {projectsSubItems.map((subItem) => {
                         const isSubActive =
@@ -285,7 +285,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       />
                     }
                   />
-                  <CollapsibleContent>
+                  <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
                     <SidebarMenuSub>
                       {rulesSubItems.map((subItem) => {
                         const isSubActive =
