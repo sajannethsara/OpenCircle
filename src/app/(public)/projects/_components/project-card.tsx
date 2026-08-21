@@ -1,10 +1,12 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import Image from "next/image"
-import { FolderGit2, ExternalLink, GitBranch, Folder, Star } from "lucide-react"
+import { FolderGit2, ExternalLink, GitBranch, Folder, Star, ArrowRight } from "lucide-react"
 import { Ranking } from "@/lib/rankings"
 import { ReadmeDialog } from "./readme-dialog"
+import { Button } from "@/components/ui/button"
 
 export interface ProjectData {
   id: string
@@ -27,6 +29,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const rankInfo = Ranking.getByName(project.badge)
   const badgeSrc = Ranking.getBadgeSrc(project.badge)
   const glowClass = Ranking.getGlowClass(project.badge)
+  const isRunning = project.type === "running"
 
   return (
     <div className="rounded-xl border border-border/60 bg-card p-5 flex flex-col justify-between space-y-4 hover:border-border transition-all shadow-sm group relative overflow-hidden">
@@ -35,7 +38,16 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5 font-semibold text-foreground overflow-hidden">
             <FolderGit2 className="h-5 w-5 shrink-0 text-primary" />
-            <span className="truncate text-base font-bold tracking-tight">{project.name}</span>
+            {isRunning ? (
+              <Link
+                href={`/projects/${project.id}`}
+                className="truncate text-base font-bold tracking-tight hover:text-primary transition-colors"
+              >
+                {project.name}
+              </Link>
+            ) : (
+              <span className="truncate text-base font-bold tracking-tight">{project.name}</span>
+            )}
           </div>
 
           {/* Badge Image with Glow */}
@@ -80,17 +92,29 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       {/* Footer Controls */}
       <div className="border-t border-border/40 pt-3 flex items-center justify-between gap-2">
-        {/* Separate README Dialog */}
-        <ReadmeDialog projectName={project.name} readmeUrl={project.readmeUrl} />
+        <div className="flex items-center gap-2">
+          {/* README Modal */}
+          <ReadmeDialog projectName={project.name} readmeUrl={project.readmeUrl} />
+
+          {/* Details Link Button (Only for running projects) */}
+          {isRunning && (
+            <Link href={`/projects/${project.id}`}>
+              <Button size="sm" variant="default" className="h-8 text-xs gap-1 font-semibold">
+                <span>Details</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </Link>
+          )}
+        </div>
 
         {/* GitHub Link */}
         <a
           href={project.githubUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0"
         >
-          <span>Repository</span>
+          <span>Repo</span>
           <ExternalLink className="h-3.5 w-3.5" />
         </a>
       </div>
