@@ -7,6 +7,12 @@ export interface GithubRepoData {
   branch: string;
 }
 
+export interface GithubAssignee {
+  username: string;
+  avatar: string;
+  profileUrl: string;
+}
+
 export interface GithubIssue {
   id: number;
   number: number;
@@ -14,6 +20,8 @@ export interface GithubIssue {
   url: string;
   createdAt: string;
   user: string;
+  body: string;
+  assignees: GithubAssignee[];
 }
 
 export interface GithubContributor {
@@ -202,6 +210,22 @@ export class GithubRepo {
           url: issue.html_url,
           createdAt: issue.created_at,
           user: issue.user?.login ?? "",
+          body: issue.body ?? "",
+          assignees: Array.isArray(issue.assignees) && issue.assignees.length > 0
+            ? issue.assignees.map((a: any) => ({
+                username: a.login,
+                avatar: a.avatar_url ?? "",
+                profileUrl: a.html_url ?? "",
+              }))
+            : issue.assignee
+            ? [
+                {
+                  username: issue.assignee.login,
+                  avatar: issue.assignee.avatar_url ?? "",
+                  profileUrl: issue.assignee.html_url ?? "",
+                },
+              ]
+            : [],
         }));
     } catch (error) {
       console.error(`[GithubRepo] Failed to fetch open issues:`, error);
@@ -225,7 +249,7 @@ export class GithubRepo {
       this.getRepo(),
       this.getFolderFileUrls(docFolderName),
       this.getContributors(),
-      this.getOpenIssues("closed"),
+      this.getOpenIssues("open"),
     ]);
 
     const files = folderFiles.map((f) => f.name);
