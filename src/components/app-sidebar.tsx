@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/collapsible"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
+import { OpenCircleLogo } from "@/components/oc-logo"
+
 const platformNavItems = [
   {
     title: "Home",
@@ -43,14 +45,20 @@ const platformNavItems = [
     icon: CircleDot,
   },
   {
-    title: "Projects",
-    url: "/projects",
-    icon: FolderGit2,
-  },
-  {
     title: "Events",
     url: "/events",
     icon: Calendar,
+  },
+]
+
+const projectsSubItems = [
+  {
+    title: "Running",
+    url: "/projects/running",
+  },
+  {
+    title: "Upcoming",
+    url: "/projects/upcoming",
   },
 ]
 
@@ -72,7 +80,10 @@ const rulesSubItems = [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const isRulesActive = pathname.startsWith("/rules")
+  const isProjectsActive = pathname.startsWith("/projects")
+
   const [rulesOpen, setRulesOpen] = React.useState(true)
+  const [projectsOpen, setProjectsOpen] = React.useState(true)
 
   React.useEffect(() => {
     if (isRulesActive) {
@@ -80,30 +91,33 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   }, [isRulesActive])
 
-  const handleParentClick = (e: React.MouseEvent) => {
+  React.useEffect(() => {
+    if (isProjectsActive) {
+      setProjectsOpen(true)
+    }
+  }, [isProjectsActive])
+
+  const handleRulesParentClick = () => {
     if (!rulesOpen) {
       setRulesOpen(true)
     }
   }
 
+  const handleProjectsParentClick = () => {
+    if (!projectsOpen) {
+      setProjectsOpen(true)
+    }
+  }
+
   return (
     <Sidebar variant="sidebar" collapsible="icon" {...props}>
-      {/* Header with OS.svg logo */}
+      {/* Header with OpenCircle logo */}
       <SidebarHeader className="border-b border-border/40 p-2 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
         <Link
           href="/"
           className="flex items-center gap-3 font-semibold text-foreground px-2 py-1 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-full transition-all"
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-background p-1.5 shadow-sm">
-            <Image
-              src="/OS.svg"
-              alt="OpenCircle Logo"
-              width={20}
-              height={20}
-              className="h-5 w-5 object-contain shrink-0"
-              priority
-            />
-          </div>
+          <OpenCircleLogo className="h-8 w-8 shrink-0 text-foreground" />
           <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
             <span className="text-sm font-bold leading-tight tracking-tight truncate">OpenCircle</span>
             <span className="text-[11px] font-medium text-muted-foreground truncate">Platform ⭕</span>
@@ -119,8 +133,95 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* Main Nav Items */}
-              {platformNavItems.map((item) => {
+              {/* Home */}
+              {platformNavItems.slice(0, 1).map((item) => {
+                const isActive = pathname === item.url
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      render={
+                        <Link href={item.url} className="flex items-center gap-3">
+                          <item.icon className="h-4 w-4 shrink-0" />
+                          <span className="text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
+                        </Link>
+                      }
+                      isActive={isActive}
+                      tooltip={item.title}
+                      className={
+                        isActive
+                          ? "bg-accent font-medium text-accent-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }
+                    />
+                  </SidebarMenuItem>
+                )
+              })}
+
+              {/* Collapsible Projects Parent linking to /projects/running */}
+              <Collapsible open={projectsOpen} onOpenChange={setProjectsOpen} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger
+                    nativeButton={false}
+                    render={
+                      <SidebarMenuButton
+                        render={
+                          <Link
+                            href="/projects/running"
+                            onClick={handleProjectsParentClick}
+                            className="flex w-full items-center justify-between"
+                          >
+                            <div className="flex items-center gap-3">
+                              <FolderGit2 className="h-4 w-4 shrink-0" />
+                              <span className="text-sm group-data-[collapsible=icon]:hidden">Projects</span>
+                            </div>
+                            <ChevronRight
+                              className={`h-4 w-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden ${
+                                projectsOpen ? "rotate-90" : ""
+                              }`}
+                            />
+                          </Link>
+                        }
+                        isActive={isProjectsActive}
+                        tooltip="Projects"
+                        className={
+                          isProjectsActive
+                            ? "font-medium text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }
+                      />
+                    }
+                  />
+                  <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
+                    <SidebarMenuSub>
+                      {projectsSubItems.map((subItem) => {
+                        const isSubActive =
+                          pathname === subItem.url ||
+                          (subItem.url === "/projects/running" && pathname === "/projects")
+                        return (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton
+                              render={
+                                <Link href={subItem.url} className="w-full">
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              }
+                              isActive={isSubActive}
+                              className={
+                                isSubActive
+                                  ? "font-medium text-foreground bg-accent/60"
+                                  : "text-muted-foreground hover:text-foreground"
+                              }
+                            />
+                          </SidebarMenuSubItem>
+                        )
+                      })}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              {/* Remaining main items (Events) */}
+              {platformNavItems.slice(1).map((item) => {
                 const isActive = pathname === item.url || (item.url !== "/" && pathname.startsWith(item.url))
                 return (
                   <SidebarMenuItem key={item.title}>
@@ -128,7 +229,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       render={
                         <Link href={item.url} className="flex items-center gap-3">
                           <item.icon className="h-4 w-4 shrink-0" />
-                          <span className="text-sm">{item.title}</span>
+                          <span className="text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
                         </Link>
                       }
                       isActive={isActive}
@@ -153,12 +254,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         render={
                           <Link
                             href="/rules/ranking"
-                            onClick={handleParentClick}
+                            onClick={handleRulesParentClick}
                             className="flex w-full items-center justify-between"
                           >
                             <div className="flex items-center gap-3">
                               <ScrollText className="h-4 w-4 shrink-0" />
-                              <span className="text-sm">Rules & Ranks</span>
+                              <span className="text-sm group-data-[collapsible=icon]:hidden">Rules & Ranks</span>
                             </div>
                             <ChevronRight
                               className={`h-4 w-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden ${
@@ -177,7 +278,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       />
                     }
                   />
-                  <CollapsibleContent>
+                  <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
                     <SidebarMenuSub>
                       {rulesSubItems.map((subItem) => {
                         const isSubActive =
