@@ -361,6 +361,7 @@ export function AdminProjectsManager() {
           </DialogContent>
         </Dialog>
       </div>
+    </div>
 
       {/* Tabs & Search Filter */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-2 border-b border-border/40">
