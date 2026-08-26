@@ -118,7 +118,7 @@ export function ProjectsFeed({ projectType = "running" }: ProjectsFeedProps) {
         </div>
 
         {/* Add Project Modal */}
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        {/* <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger
             render={
               <Button className="shrink-0">
@@ -183,7 +183,7 @@ export function ProjectsFeed({ projectType = "running" }: ProjectsFeedProps) {
               </div>
             </form>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
       </div>
 
       {/* Filter / Search Bar */}
