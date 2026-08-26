@@ -15,7 +15,7 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/__tests__/**/*.test.ts"],
     // Provide a readable reporter for CI and terminal output
-    reporter: ["verbose"],
+    reporters: ["verbose"],
     coverage: {
       provider: "v8",
       include: ["src/lib/ranking/**/*.ts"],
