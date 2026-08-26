@@ -14,6 +14,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
+import { useRanking } from "@/hooks/use-ranking"
+
 interface ProjectsFeedProps {
   projectType?: "running" | "upcoming"
 }
@@ -23,6 +25,10 @@ export function ProjectsFeed({ projectType = "running" }: ProjectsFeedProps) {
   const [projects, setProjects] = React.useState<ProjectData[]>([])
   const [loading, setLoading] = React.useState<boolean>(true)
   const [error, setError] = React.useState<string | null>(null)
+
+  // Background ranking sync from client IP
+  const { refreshRankings, isRefreshing } = useRanking()
+  const hasAutoRunRef = React.useRef(false)
 
   // Search
   const [searchQuery, setSearchQuery] = React.useState<string>("")
@@ -59,6 +65,23 @@ export function ProjectsFeed({ projectType = "running" }: ProjectsFeedProps) {
   React.useEffect(() => {
     fetchProjects()
   }, [fetchProjects])
+
+  // Background refresh ranking mechanism using user's browser / public IP
+  React.useEffect(() => {
+    if (projects.length > 0 && !hasAutoRunRef.current && !isRefreshing) {
+      const needsCalculation = projects.some((p) => p.score === 0)
+      if (needsCalculation) {
+        hasAutoRunRef.current = true
+        refreshRankings()
+          .then(() => {
+            fetchProjects()
+          })
+          .catch((err) => {
+            console.error("Background client ranking sync error:", err)
+          })
+      }
+    }
+  }, [projects, isRefreshing, refreshRankings, fetchProjects])
 
   const handleAddProject = async (e: React.FormEvent) => {
     e.preventDefault()
