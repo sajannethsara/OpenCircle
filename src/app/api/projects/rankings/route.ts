@@ -25,11 +25,18 @@ import type { RankBadge } from "@/generated/prisma/enums";
  * Requires: active admin session.
  */
 export async function POST(request: NextRequest) {
+  const isAdmin = await verifyAdminSession();
+  if (!isAdmin) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   try {
     // ── Validation Only ──────────────────────────────────────────────────────
     // Ranking sync only modifies mathematical score (0-100) and tier badge.
     // Sensitive management (create, delete, metadata edit) remains admin-only.
-
     // ── Parse + Validate Body ─────────────────────────────────────────────────
     const body = await request.json();
     const { results } = body as {
