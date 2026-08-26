@@ -14,10 +14,12 @@ import {
   AlertCircle,
   ExternalLink,
   Search,
+  RefreshCw,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Ranking } from "@/lib/rankings"
+import { useRanking } from "@/hooks/use-ranking"
 import {
   Dialog,
   DialogContent,
@@ -76,6 +78,10 @@ export function AdminProjectsManager() {
   const [typeInput, setTypeInput] = React.useState("running")
   const [submitting, setSubmitting] = React.useState(false)
 
+  // Ranking Hook
+  const { refreshRankings, isRefreshing, progress: rankingProgress } = useRanking()
+  const hasAutoRunRef = React.useRef(false)
+
   const fetchProjects = React.useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -98,6 +104,23 @@ export function AdminProjectsManager() {
   React.useEffect(() => {
     fetchProjects()
   }, [fetchProjects])
+
+  // Automatically trigger ranking calculation in background if any project has score 0 or is uncalculated
+  React.useEffect(() => {
+    if (projects.length > 0 && !hasAutoRunRef.current && !isRefreshing) {
+      const needsCalculation = projects.some((p) => p.score === 0)
+      if (needsCalculation) {
+        hasAutoRunRef.current = true
+        refreshRankings()
+          .then(() => {
+            fetchProjects()
+          })
+          .catch((err) => {
+            console.error("Background ranking calculation error:", err)
+          })
+      }
+    }
+  }, [projects, isRefreshing, refreshRankings, fetchProjects])
 
   const handleUpdateStatus = async (id: string, newType: "running" | "upcoming" | "pending") => {
     try {
@@ -236,16 +259,44 @@ export function AdminProjectsManager() {
           </p>
         </div>
 
-        {/* Add Project Modal */}
-        <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-          <DialogTrigger
-            render={
-              <Button className="shrink-0">
-                <Plus className="mr-2 h-4 w-4" />
-                Add New Project
-              </Button>
-            }
-          />
+        <div className="flex items-center gap-2">
+          {/* Refresh Rankings Button */}
+          <Button
+            variant="outline"
+            className="shrink-0"
+            disabled={isRefreshing}
+            onClick={async () => {
+              try {
+                await refreshRankings()
+                await fetchProjects()
+              } catch (e) {
+                console.error("Manual refresh error:", e)
+              }
+            }}
+          >
+            {isRefreshing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" />
+                Calculating Scores...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh Rankings
+              </>
+            )}
+          </Button>
+
+          {/* Add Project Modal */}
+          <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+            <DialogTrigger
+              render={
+                <Button className="shrink-0">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add New Project
+                </Button>
+              }
+            />
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Add New Project</DialogTitle>
