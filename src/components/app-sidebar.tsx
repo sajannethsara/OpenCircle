@@ -10,6 +10,7 @@ import {
   Calendar,
   ScrollText,
   ChevronRight,
+  ExternalLink,
 } from "lucide-react"
 
 import {
@@ -29,6 +30,7 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
+import { Badge } from "@/components/ui/badge"
 import {
   Collapsible,
   CollapsibleContent,
@@ -118,9 +120,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           className="flex items-center gap-3 font-semibold text-foreground px-2 py-1 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-full transition-all"
         >
           <OpenCircleLogo className="h-8 w-8 shrink-0 text-foreground" />
-          <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
+          <div className="flex flex-col items-start group-data-[collapsible=icon]:hidden overflow-hidden">
             <span className="text-sm font-bold leading-tight tracking-tight truncate">OpenCircle</span>
-            <span className="text-[11px] font-medium text-muted-foreground truncate">Platform ⭕</span>
+            <Badge variant="success" className="text-[9px] px-1.5 py-0 font-bold uppercase tracking-wider mt-0.5">
+              BETA
+            </Badge>
           </div>
         </Link>
       </SidebarHeader>
@@ -312,20 +316,36 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         <SidebarSeparator className="my-2" />
 
-        {/* Batch Info Group */}
+        {/* Discord Invite CTA Group */}
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Batch Info
+            Community
           </SidebarGroupLabel>
-          <SidebarGroupContent className="px-2 py-1 text-xs text-muted-foreground">
-            <div className="rounded-md bg-muted/50 p-2.5 space-y-1.5 border border-border/40">
-              <div className="flex items-center justify-between font-medium text-foreground">
-                <span>Faculty of IT</span>
-                <span className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-mono">B23</span>
+          <SidebarGroupContent className="px-2 py-1">
+            <div className="rounded-xl border border-[#5865F2]/25 bg-[#5865F2]/10 p-3 space-y-2.5 shadow-xs">
+              <div className="flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#5865F2] text-white shrink-0 shadow-xs">
+                  <svg className="h-4 w-4 fill-current" viewBox="0 0 127.14 96.36">
+                    <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.14c2.64-27.38-4.51-51.11-18.91-72.13ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.92,53.87,53,48.8,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.92,96.1,53,91,65.69,84.69,65.69Z" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-foreground leading-tight">Join Discord</h4>
+                  <p className="text-[10px] text-muted-foreground">OpenCircle B23 Community</p>
+                </div>
               </div>
-              <p className="text-[11px] leading-relaxed text-muted-foreground">
-                Univ. of Moratuwa student-led software development.
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Connect with maintainers, ask questions, and share project updates.
               </p>
+              <a
+                href="https://discord.gg/Yg2sxyqMD"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-1.5 w-full h-8 rounded-lg bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold transition-colors shadow-xs"
+              >
+                <span>Join Discord Server</span>
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
