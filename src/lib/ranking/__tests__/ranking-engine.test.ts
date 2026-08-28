@@ -262,8 +262,8 @@ describe("calculateHealthScore() — missing data redistribution", () => {
 // ─── Community ────────────────────────────────────────────────────────────────
 
 describe("calculateActiveContributorScore()", () => {
-  it("at ceiling (25) → 100", () => {
-    expect(calculateActiveContributorScore(25)).toBe(100);
+  it("at ceiling (10) → 100", () => {
+    expect(calculateActiveContributorScore(10)).toBe(100);
   });
 
   it("zero → 0", () => {
@@ -277,7 +277,7 @@ describe("calculateActiveContributorScore()", () => {
 
 describe("calculateCommunityScore()", () => {
   it("API unavailable (-1 contributors) → uses uniquePRAuthors weight only", () => {
-    const features = { activeContributors: -1, uniquePRAuthors: 20 };
+    const features = { activeContributors: -1, uniquePRAuthors: 10 };
     const score = calculateCommunityScore(features);
     // Only uniquePRAuthors available at ceiling → should be 100
     expect(score).toBe(100);
