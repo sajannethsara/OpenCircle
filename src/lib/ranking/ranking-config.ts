@@ -40,8 +40,8 @@ export const HEALTH_WEIGHTS = {
 } as const;
 
 export const COMMUNITY_WEIGHTS = {
-  activeContributors: 0.60,
-  prAuthors: 0.40,
+  activeContributors: 0.50,
+  prAuthors: 0.50,
 } as const;
 
 export const RELEASE_WEIGHTS = {
@@ -59,10 +59,10 @@ export const RELEASE_WEIGHTS = {
 export const SCORING_CEILINGS = {
   stars: 500,           // 500 stars is exceptional for a batch project
   forks: 100,           // 100 forks = significant community reuse
-  recentCommits: 200,   // ~2 commits/day for 90 days = very active
-  recentPRs: 60,        // ~5 PRs/week for 90 days = excellent velocity
-  activeContributors: 25, // 25 active contributors in 90 days = outstanding
-  uniquePRAuthors: 20,  // 20 distinct PR authors = broad participation
+  recentCommits: 40,    // ~3 commits/week for 90 days = very active (tuned for smaller community)
+  recentPRs: 30,        // ~2-3 PRs/week for 90 days = excellent velocity (tuned for smaller community)
+  activeContributors: 10, // 10 active contributors in 90 days = outstanding (tuned for smaller community)
+  uniquePRAuthors: 10,  // 10 distinct PR authors = broad participation (tuned for smaller community)
   releasesPerYear: 12,  // monthly releases = mature release engineering
 } as const;
 
