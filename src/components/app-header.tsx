@@ -31,10 +31,6 @@ export function AppHeader() {
       </div>
 
       <div className="flex items-center gap-2.5">
-        <div className="hidden sm:flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-          <Sparkles className="h-3.5 w-3.5 text-foreground" />
-          <span>Batch 23 Ecosystem</span>
-        </div>
 
         <ThemeToggle />
 

@@ -123,7 +123,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <div className="flex flex-col items-start group-data-[collapsible=icon]:hidden overflow-hidden">
             <span className="text-sm font-bold leading-tight tracking-tight truncate">OpenCircle</span>
             <Badge variant="success" className="text-[9px] px-1.5 py-0 font-bold uppercase tracking-wider mt-0.5">
-              BETA
+              Experiment
             </Badge>
           </div>
         </Link>
