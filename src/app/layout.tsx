@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OpenCircle (OC) Platform | Faculty of IT Batch 23",
+  title: "OpenCircle (OC) Platform",
   description: "Empowering Sri Lankan Engineering Batches through Collaborative Open-Source Software Development.",
 };
 
