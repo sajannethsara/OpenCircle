@@ -8,10 +8,13 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Sparkles } from "lucide-react";
 
 const routeTitles: Record<string, string> = {
-  "/": "Dashboard & Overview",
-  "/projects": "Running Projects Dashboard",
-  "/events": "Help Desk & Event Hub",
-  "/rules": "Transparency & Governance Rules",
+  "/": "Welcome",
+  "/projects/running": "Explore Running Projects",
+  "/projects/upcoming": "Explore Upcoming Projects",
+  "/events": "Red Team Weekly Sessions",
+  "/rules/ranking": "OC Ranking System",
+  "/rules/developer": "OC Developer Guidelines",
+  "/rules/maintainer": "OC Maintainer Guidelines",
 };
 
 export function AppHeader() {
@@ -22,7 +25,7 @@ export function AppHeader() {
     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border/40 bg-background/85 px-4 backdrop-blur transition-all">
       <div className="flex items-center gap-3">
         <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="h-4" />
+        {/* <Separator orientation="vertical" className="h-4" /> */}
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold tracking-tight text-foreground">
             {currentTitle}
