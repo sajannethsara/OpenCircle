@@ -1,0 +1,39 @@
+name: Discord Stale PR Nudge
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # daily at 09:00 UTC
+  workflow_dispatch: {} # lets you trigger it manually to test/inspect it
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  stale-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout notifier scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/scripts/discord
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: .github/scripts/discord/package-lock.json
+
+      - name: Install script dependencies
+        working-directory: .github/scripts/discord
+        run: npm ci --no-audit --no-fund
+
+      - name: Send stale-PR digest (only if any qualify)
+        working-directory: .github/scripts/discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node stale-prs.mjs

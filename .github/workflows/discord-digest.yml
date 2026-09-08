@@ -1,0 +1,37 @@
+name: Discord Digest
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # every 6 hours, UTC
+  workflow_dispatch: {} # lets you trigger a digest manually to test/inspect it
+
+permissions:
+  contents: read
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout notifier scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/scripts/discord
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: .github/scripts/discord/package-lock.json
+
+      - name: Install script dependencies
+        working-directory: .github/scripts/discord
+        run: npm ci --no-audit --no-fund
+
+      - name: Send digest (only if something is queued)
+        working-directory: .github/scripts/discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: node digest.mjs

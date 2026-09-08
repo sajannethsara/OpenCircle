@@ -1,0 +1,9 @@
+{
+  "name": "discord-notify-scripts",
+  "private": true,
+  "type": "module",
+  "description": "GitHub -> Discord notification scripts, run by .github/workflows/discord-*.yml",
+  "dependencies": {
+    "@actions/cache": "^6.2.0"
+  }
+}

@@ -1,0 +1,55 @@
+name: Discord Notifications
+
+on:
+  pull_request:
+    types: [opened, closed, reopened, ready_for_review, assigned, unassigned, labeled, unlabeled, review_requested]
+  issues:
+    types: [opened, closed, reopened, assigned, unassigned, labeled, unlabeled]
+  push:
+    branches: [main, dev]
+  release:
+    types: [published]
+  create:  # fires for new branches and tags (filtered below)
+  delete:  # fires for deleted branches and tags (filtered below)
+  fork:
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  # `actions: write` is NOT required for actions/cache — read/write on the
+  # cache scope is implicit for the default GITHUB_TOKEN.
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    # Skip tag create/delete events — only process branch operations
+    if: >
+      (github.event_name != 'create' && github.event_name != 'delete') ||
+      github.event.ref_type == 'branch'
+
+    steps:
+      - name: Checkout notifier scripts
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/scripts/discord
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: .github/scripts/discord/package-lock.json
+
+      - name: Install script dependencies
+        working-directory: .github/scripts/discord
+        run: npm ci --no-audit --no-fund
+
+      - name: Send Discord Notification
+        working-directory: .github/scripts/discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node notify.mjs
