@@ -128,7 +128,7 @@ export function ReadmeDialog({ projectName, readmeUrl }: ReadmeDialogProps) {
           )}
 
           {!loading && !error && markdown.trim() && (
-            <MdxViewer content={markdown} />
+            <MdxViewer content={markdown} baseUrl={readmeUrl} />
           )}
         </div>
       </DialogContent>

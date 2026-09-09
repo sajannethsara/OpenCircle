@@ -3,13 +3,45 @@
 import * as React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import rehypeRaw from "rehype-raw"
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize"
 
 interface MdxViewerProps {
   content: string
   className?: string
+  /**
+   * The URL of the source markdown file (e.g. a raw.githubusercontent.com README URL).
+   * When provided, relative image/link paths (e.g. `./overview.png`) are resolved
+   * against this file's directory, the same way GitHub resolves them.
+   */
+  baseUrl?: string
 }
 
-export function MdxViewer({ content, className = "" }: MdxViewerProps) {
+// Extend the default sanitize schema so `<img>` tags surviving `rehype-raw`
+// (used to support raw HTML like `<img src="...">` in READMEs) keep their
+// attributes while still stripping dangerous content like `<script>`.
+const sanitizeSchema = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    img: [...(defaultSchema.attributes?.img ?? []), "src", "alt", "title", "width", "height", "align"],
+  },
+}
+
+function resolveRelativeUrl(url: unknown, baseUrl: string | undefined): string | undefined {
+  if (typeof url !== "string" || !url || !baseUrl) return typeof url === "string" ? url : undefined
+  // Leave absolute URLs, anchors, and data URIs untouched.
+  if (/^([a-z][a-z0-9+.-]*:)?\/\//i.test(url) || url.startsWith("#") || url.startsWith("data:")) {
+    return url
+  }
+  try {
+    return new URL(url, baseUrl).toString()
+  } catch {
+    return url
+  }
+}
+
+export function MdxViewer({ content, className = "", baseUrl }: MdxViewerProps) {
   if (!content || !content.trim()) {
     return (
       <div className="text-muted-foreground/60 text-xs italic py-4">
@@ -22,6 +54,7 @@ export function MdxViewer({ content, className = "" }: MdxViewerProps) {
     <div className={`prose dark:prose-invert max-w-none space-y-4 text-sm leading-relaxed ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
         components={{
           h1: ({ node, ...props }) => (
             <h1 className="text-xl font-bold tracking-tight text-foreground border-b border-border/40 pb-2 mt-4 mb-3" {...props} />
@@ -40,7 +73,7 @@ export function MdxViewer({ content, className = "" }: MdxViewerProps) {
           ),
           a: ({ node, href, ...props }) => (
             <a
-              href={href}
+              href={resolveRelativeUrl(href, baseUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary font-medium hover:underline break-words"
@@ -100,7 +133,7 @@ export function MdxViewer({ content, className = "" }: MdxViewerProps) {
           img: ({ node, alt, src: imgSrc, ...props }) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={imgSrc}
+              src={resolveRelativeUrl(imgSrc, baseUrl)}
               alt={alt || "Markdown Image"}
               className="max-w-full h-auto rounded-md my-3 border border-border/40 object-contain"
               loading="lazy"

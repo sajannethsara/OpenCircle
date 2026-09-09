@@ -350,7 +350,7 @@ export function ProjectDetails({ projectId }: ProjectDetailsProps) {
               <span className="text-xs font-medium">Loading README.md...</span>
             </div>
           ) : readmeContent ? (
-            <MdxViewer content={readmeContent} />
+            <MdxViewer content={readmeContent} baseUrl={project.readmeUrl} />
           ) : (
             <div className="flex items-center justify-center p-12 text-muted-foreground text-xs">
               <span>No README documentation available for this repository.</span>
@@ -405,7 +405,7 @@ export function ProjectDetails({ projectId }: ProjectDetailsProps) {
                 <span className="text-xs font-medium">Loading documentation file...</span>
               </div>
             ) : docContent ? (
-              <MdxViewer content={docContent} />
+              <MdxViewer content={docContent} baseUrl={selectedDocUrl ?? undefined} />
             ) : (
               <div className="flex items-center justify-center p-12 text-muted-foreground text-xs">
                 <span>Select a documentation file from the list to view.</span>
