@@ -188,7 +188,7 @@ describe("calculateActivityScore()", () => {
   it("max activity → high score", () => {
     const max = {
       recentCommits: 200,
-      recentPRs: 60,
+      recentPRs: 100,
       lastPush: new Date(SNAPSHOT.snapshotTime.getTime() - 86400000).toISOString(),
     };
     const score = calculateActivityScore(max, SNAPSHOT.snapshotTime);
@@ -350,7 +350,7 @@ describe("Fork penalty", () => {
       stars: 500,
       forks: 100,
       recentCommits: 200,
-      recentPRs: 60,
+      recentPRs: 100,
       lastPush: new Date(SNAPSHOT.snapshotTime.getTime() - 86400000).toISOString(),
       openIssues: 0,
       closedIssues: 1000,

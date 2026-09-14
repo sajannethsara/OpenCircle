@@ -19,7 +19,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Ranking } from "@/lib/rankings"
-import { useRanking } from "@/hooks/use-ranking"
 import {
   Dialog,
   DialogContent,
@@ -78,9 +77,7 @@ export function AdminProjectsManager() {
   const [typeInput, setTypeInput] = React.useState("running")
   const [submitting, setSubmitting] = React.useState(false)
 
-  // Ranking Hook
-  const { refreshRankings, isRefreshing, progress: rankingProgress } = useRanking()
-  const hasAutoRunRef = React.useRef(false)
+  const [isRefreshingRankings, setIsRefreshingRankings] = React.useState(false)
 
   const fetchProjects = React.useCallback(async () => {
     setLoading(true)
@@ -105,22 +102,27 @@ export function AdminProjectsManager() {
     fetchProjects()
   }, [fetchProjects])
 
-  // Automatically trigger ranking calculation in background if any project has score 0 or is uncalculated
-  React.useEffect(() => {
-    if (projects.length > 0 && !hasAutoRunRef.current && !isRefreshing) {
-      const needsCalculation = projects.some((p) => p.score === 0)
-      if (needsCalculation) {
-        hasAutoRunRef.current = true
-        refreshRankings()
-          .then(() => {
-            fetchProjects()
-          })
-          .catch((err) => {
-            console.error("Background ranking calculation error:", err)
-          })
+  const handleRefreshRankings = async () => {
+    setIsRefreshingRankings(true)
+    try {
+      const res = await fetch("/api/admin/rankings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ forceAll: false }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        await fetchProjects()
+      } else {
+        alert(data.error || "Failed to sync rankings")
       }
+    } catch (err) {
+      console.error("Manual refresh error:", err)
+      alert("Error syncing rankings")
+    } finally {
+      setIsRefreshingRankings(false)
     }
-  }, [projects, isRefreshing, refreshRankings, fetchProjects])
+  }
 
   const handleUpdateStatus = async (id: string, newType: "running" | "upcoming" | "pending") => {
     try {
@@ -264,20 +266,13 @@ export function AdminProjectsManager() {
           <Button
             variant="outline"
             className="shrink-0"
-            disabled={isRefreshing}
-            onClick={async () => {
-              try {
-                await refreshRankings()
-                await fetchProjects()
-              } catch (e) {
-                console.error("Manual refresh error:", e)
-              }
-            }}
+            disabled={isRefreshingRankings}
+            onClick={handleRefreshRankings}
           >
-            {isRefreshing ? (
+            {isRefreshingRankings ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" />
-                Calculating Scores...
+                Syncing Rankings...
               </>
             ) : (
               <>

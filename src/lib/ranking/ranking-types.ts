@@ -95,6 +95,15 @@ export interface CachedProjectData {
   timestamps: FeatureGroupTimestamps;
 }
 
+/** Stored ranking metrics inside PostgreSQL (JSON column) */
+export interface StoredRankingMetrics {
+  repoKey: string;
+  features: ProjectFeatures;
+  categoryScores?: CategoryScores;
+  timestamps: FeatureGroupTimestamps;
+  lastCalculatedAt: string;
+}
+
 // ─── Ranking Snapshot ────────────────────────────────────────────────────────
 
 /**

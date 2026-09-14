@@ -38,8 +38,10 @@ model Project {
   readmeUrl   String      @default("") @map("readme_url")
   docFolder   String      @default("docs") @map("doc_folder")
   type        ProjectType @default(pending)
-  score       Int         @default(0)
-  badge       RankBadge   @default(warrior)
+  score          Int         @default(0)
+  badge          RankBadge   @default(warrior)
+  rankingMetrics Json?       @map("ranking_metrics")
+  lastRankedAt   DateTime?   @map("last_ranked_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

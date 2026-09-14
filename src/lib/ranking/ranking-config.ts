@@ -59,8 +59,8 @@ export const RELEASE_WEIGHTS = {
 export const SCORING_CEILINGS = {
   stars: 500,           // 500 stars is exceptional for a batch project
   forks: 100,           // 100 forks = significant community reuse
-  recentCommits: 40,    // ~3 commits/week for 90 days = very active (tuned for smaller community)
-  recentPRs: 30,        // ~2-3 PRs/week for 90 days = excellent velocity (tuned for smaller community)
+  recentCommits: 100,   // 100 commits in 90 days = maximum commit velocity ceiling
+  recentPRs: 100,       // 100 PRs in 90 days = maximum velocity ceiling
   activeContributors: 10, // 10 active contributors in 90 days = outstanding (tuned for smaller community)
   uniquePRAuthors: 10,  // 10 distinct PR authors = broad participation (tuned for smaller community)
   releasesPerYear: 12,  // monthly releases = mature release engineering
@@ -136,6 +136,17 @@ export const CACHE_TTLS = {
   health: 12 * 60 * 60 * 1000,     // 12h — issue stats, PR merge rate
   community: 12 * 60 * 60 * 1000,  // 12h — contributors, PR authors
   releases: 12 * 60 * 60 * 1000,   // 12h — release recency + frequency
+} as const;
+
+// ─── Database Retention TTLs (Tiered for Daily GitHub Action & DB Cache) ───────
+// High-volatility groups sync daily; low-volatility groups sync weekly/bi-weekly.
+
+export const DB_RETENTION_TTLS = {
+  repository: 24 * 60 * 60 * 1000,       // 24 hours (daily)  — stars, forks, push
+  activity:   24 * 60 * 60 * 1000,       // 24 hours (daily)  — recent commits, PRs
+  health:      7 * 24 * 60 * 60 * 1000,  // 7 days (weekly)   — issue management, PR merge rate
+  community:   7 * 24 * 60 * 60 * 1000,  // 7 days (weekly)   — contributors, PR authors
+  releases:   14 * 24 * 60 * 60 * 1000,  // 14 days (bi-week) — release frequency & recency
 } as const;
 
 // ─── Fork Penalty ─────────────────────────────────────────────────────────────
