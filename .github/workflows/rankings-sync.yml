@@ -1,0 +1,49 @@
+name: Scheduled Rankings Sync
+
+on:
+  schedule:
+    # Run every night at midnight UTC (00:00 UTC)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      force_all:
+        description: 'Force refetch all criteria regardless of retention TTL'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  sync-rankings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DB_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run Rankings Sync
+        run: |
+          if [ "${{ github.event.inputs.force_all }}" = "true" ]; then
+            npm run sync:rankings -- --force
+          else
+            npm run sync:rankings
+          fi
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DB_URL: ${{ secrets.DATABASE_URL }}
+          GITHUB_PAT: ${{ secrets.GITHUB_PAT }}

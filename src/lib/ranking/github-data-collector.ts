@@ -111,7 +111,7 @@ function sleep(ms: number): Promise<void> {
  * All Search API calls across all projects are routed through this queue
  * so that parallel project fetching doesn't violate the per-minute limit.
  */
-class SearchQueue {
+export class SearchQueue {
   private lastSearchAt = 0;
   private readonly delay: number;
 
@@ -142,7 +142,7 @@ interface RepoApiResponse {
   fork: boolean;
 }
 
-async function fetchRepositoryGroup(
+export async function fetchRepositoryGroup(
   owner: string,
   repo: string,
   token?: string
@@ -179,7 +179,7 @@ interface StatsContributorResponse {
   weeks: StatsContributorWeek[];
 }
 
-async function fetchActivityGroup(
+export async function fetchActivityGroup(
   owner: string,
   repo: string,
   snapshot: RankingSnapshot,
@@ -207,7 +207,7 @@ async function fetchActivityGroup(
   };
 }
 
-async function fetchHealthGroup(
+export async function fetchHealthGroup(
   owner: string,
   repo: string,
   snapshot: RankingSnapshot,
@@ -250,7 +250,7 @@ async function fetchHealthGroup(
   };
 }
 
-async function fetchCommunityGroup(
+export async function fetchCommunityGroup(
   owner: string,
   repo: string,
   snapshot: RankingSnapshot,
@@ -347,7 +347,7 @@ interface ReleaseApiItem {
   draft: boolean;
 }
 
-async function fetchReleasesGroup(
+export async function fetchReleasesGroup(
   owner: string,
   repo: string,
   snapshot: RankingSnapshot,
