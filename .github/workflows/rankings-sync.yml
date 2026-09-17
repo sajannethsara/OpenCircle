@@ -2,8 +2,9 @@ name: Scheduled Rankings Sync
 
 on:
   schedule:
-    # Run every night at midnight UTC (00:00 UTC)
-    - cron: '0 0 * * *'
+    # Run daily at 18:35 UTC (approx. 12:05 AM local time UTC+5:30)
+    # Uses an off-peak minute (:35) to avoid GitHub Actions scheduler delays and drops
+    - cron: '35 18 * * *'
   workflow_dispatch:
     inputs:
       force_all:
